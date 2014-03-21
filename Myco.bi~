@@ -1,0 +1,79 @@
+/**
+ * Myco model.
+ */
+model Myco {
+  // declare constants...
+ 
+	const popN = 736
+	const sigma_lat = 1/7
+	const prop3 = 0.85
+	const nu = 0.0
+	const dayNo = 1/365
+	const birth = dayNo * 1/70
+	const mu = dayNo * 1/70
+	const sigma_inc = 1/23
+	const sigma_lat = 1/7
+	const tau = 1/49
+	const tau_md= 1/28
+
+	const prop3 = 0.85
+	const prop4 = 1-prop3
+	const prop5 = 0.1
+	const prop6 = 0.10
+	const prop7 = 0.05
+  
+	param beta, prop, T0, kDisp	
+  
+	state S,E,POS,MD,AC,Pneumo,R
+	
+	obs incid_obs
+	
+	sub parameter {
+    	// specify the parameter model
+    
+    	// python code uses sp.random.rand(1,1)
+    	beta ~ uniform()
+    	prop ~ uniform()
+    	T0 ~ uniform()
+    	kDisp ~ uniform()
+  	}
+
+	sub initial {
+    	// specify the initial condition model
+		// initial conditions are priors over the initial values of the state variables
+		// centre these on the deterministic initial values of state variables
+		S ~ 
+		E ~
+		POS ~
+		MD ~
+		AC ~
+		Pneumo ~
+		R ~
+	}
+
+	sub transition(delta=1.0){
+    	// delta = time step for ode the
+    	ode{
+			dS/dt = -FOI * S -mu * S
+		
+			dE/dt = FOI * S -sigma_inc * E -mu * E
+		
+			dPOS/dt = sigma_inc * E -sigma_lat * POS -mu * POS
+		
+			dMD/dt = prop3 * sigma_lat * POS -(prop6 * tau_md * MD) - (prop5 * tau_md * MD) -(prop7 * tau * MD) -mu * MD
+		
+			dAC/dt = prop4 * sigma_lat * POS + prop5 * tau_md * MD -tau * AC -mu * AC
+		
+			dPneumo/dt = prop6 * tau_md * MD -tau * PNEU -mu * PNEU
+		
+			dR/dt = (tau * PNEU) +(tau *prop7*MD) + (tau * AC) -mu *R
+    	}
+	}
+
+	// put observed data (incidence) in obs.nc
+
+	sub observation {
+	// specify the observation model
+	}
+
+}
